@@ -37,7 +37,7 @@ bool PrintFileNotFoundError(const string& file_name, const string& from, const s
     return false;
 }
 
-bool Preprocess(const path& in_file, ostream& os, const vector<path>& include_directories) {
+bool PreprocessFileToStream(const path& in_file, ostream& os, const vector<path>& include_directories) {
     static regex quote_include(R"(\s*#\s*include\s*\"([^"]*)\"\s*)");
     static regex corner_include(R"(\s*#\s*include\s*<([^>]*)>\s*)");
     
@@ -64,7 +64,7 @@ bool Preprocess(const path& in_file, ostream& os, const vector<path>& include_di
         if (need_check && !find_file(file_path, m.str(1), include_directories)) {
             return PrintFileNotFoundError(m.str(1), in_file.string(), line_number);
         }
-        Preprocess(file_path, os, include_directories);
+        PreprocessFileToStream(file_path, os, include_directories);
     }
     return true;
 }
@@ -77,7 +77,7 @@ bool Preprocess(const path& in_file, const path& out_file, const vector<path>& i
     if (!out) {
         return false;
     }
-    return Preprocess(in_file, out, include_directories);
+    return PreprocessFileToStream(in_file, out, include_directories);
 }
 
 string GetFileContents(string file) {
